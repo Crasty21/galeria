@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galeria Zdjęć</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f3f3f3;
+    }
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 20px 0;
+      text-align: center;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center;
+    }
+    .galeria-glowna {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .galeria-glowna img {
+      width: 100%;
+      height: auto;
+      max-width: 800px; 
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    }
+    .nawigacja {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .przycisk {
+      background-color: #333;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      margin: 0 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease-in-out;
+    }
+    .przycisk:hover {
+      background-color: #555;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Galeria Zdjęć</h1>
+  </header>
+  <div class="container">
+    <div class="galeria-glowna">
+      <img id="obraz" src="https://via.placeholder.com/800x600" alt="Obraz">
+    </div>
+    <div class="nawigacja">
+      <button class="przycisk" id="poprzedni">Poprzedni</button>
+      <button class="przycisk" id="nastepny">Następny</button>
+    </div>
+  </div>
+
+  <script>
+    const kluczApi = '43571169-c49dca61aab56ef9439cdeb3c';
+    const naStronę = 100;
+    const urlApi = `https://pixabay.com/api/?key=${kluczApi}&per_page=${naStronę}`;
+
+    async function pobierzObrazy() {
+      try {
+        const odpowiedź = await fetch(urlApi);
+        const dane = await odpowiedź.json();
+        return dane.hits;
+      } catch (błąd) {
+        console.error('Błąd pobierania obrazów:', błąd);
+      }
+    }
+
+    async function wyświetlObrazy() {
+      const galeriaGlowna = document.querySelector('.galeria-glowna');
+      const przyciskPoprzedni = document.getElementById('poprzedni');
+      const przyciskNastepny = document.getElementById('nastepny');
+
+      const obrazy = await pobierzObrazy();
+      let obecnyObraz = 0;
+
+      function pokazObraz(indeks) {
+        galeriaGlowna.innerHTML = `<img id="obraz" src="${obrazy[indeks].largeImageURL}" alt="${obrazy[indeks].tags}">`;
+      }
+
+      pokazObraz(obecnyObraz);
+
+      przyciskPoprzedni.addEventListener('click', () => {
+        obecnyObraz = (obecnyObraz - 1 + obrazy.length) % obrazy.length;
+        pokazObraz(obecnyObraz);
+      });
+
+      przyciskNastepny.addEventListener('click', () => {
+        obecnyObraz = (obecnyObraz + 1) % obrazy.length;
+        pokazObraz(obecnyObraz);
+      });
+    }
+
+    wyświetlObrazy();
+  </script>
+</body>
+</html>
